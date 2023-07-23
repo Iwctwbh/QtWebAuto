@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtWebAuto", "QtWebGUIAuto.vcxproj", "{88938853-FC49-49F4-84E7-A12257FFC2B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88938853-FC49-49F4-84E7-A12257FFC2B9}.Debug|x64.ActiveCfg = Debug|x64
+		{88938853-FC49-49F4-84E7-A12257FFC2B9}.Debug|x64.Build.0 = Debug|x64
+		{88938853-FC49-49F4-84E7-A12257FFC2B9}.Release|x64.ActiveCfg = Release|x64
+		{88938853-FC49-49F4-84E7-A12257FFC2B9}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {330713A8-8C24-4E2E-8E34-96658EA3DE85}
+	EndGlobalSection
+EndGlobal
