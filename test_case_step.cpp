@@ -1,23 +1,23 @@
 ﻿#include "test_case_step.h"
 
-void TestCaseStep::SetUrl(const QUrl& url)
+void TestCaseStep::SetUrl(const QUrl& arg_url)
 {
-	url_ = url;
+	url_ = arg_url;
 }
 
-void TestCaseStep::SetIsAutomatic(const bool& flag)
+void TestCaseStep::SetIsAutomatic(const bool& arg_is_automatic)
 {
-	is_automatic_ = flag;
+	is_automatic_ = arg_is_automatic;
 }
 
-void TestCaseStep::InsertAutomatic(const QString& automatic)
+void TestCaseStep::InsertAutomatic(const QString& arg_automatic)
 {
-	list_automatic_.push_back(automatic);
+	list_automatic_.push_back(arg_automatic);
 }
 
-void TestCaseStep::InsertNonAutomatic(const QString& non_automatic)
+void TestCaseStep::InsertNonAutomatic(const QString& arg_non_automatic)
 {
-	list_non_automatic_.push_back(non_automatic);
+	list_non_automatic_.push_back(arg_non_automatic);
 }
 
 const QUrl& TestCaseStep::GetUrl(void) const

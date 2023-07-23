@@ -1,24 +1,33 @@
-﻿#include <QHash>
-#include "test_case.h"
+﻿#include "test_case.h"
 
-void TestCase::SetUrl(const QUrl& url)
+void TestCase::SetUrl(const QUrl& arg_url)
 {
-	url_ = url;
+	url_ = arg_url;
 }
 
-void TestCase::SetRunningInterval(const int& interval)
+void TestCase::SetLogLevel(const QString& arg_log_level)
 {
-	RunningInterval = interval;
+	log_level_ = hash_log_level_.value(arg_log_level);
 }
 
-void TestCase::InsertCaseStep(const QUrl& url, const TestCaseStep& case_step)
+void TestCase::SetShowWebViewTime(const QString& arg_show_web_view_time)
 {
-	case_steps_.insert(url, case_step);
+	show_web_view_time_ = has_show_web_view_time_.value(arg_show_web_view_time);
 }
 
-void TestCase::SetStopStep(const QString& stop_step)
+void TestCase::SetRunningInterval(const int& arg_interval)
 {
-	stop_step_ = stop_step;
+	running_interval_ = arg_interval;
+}
+
+void TestCase::InsertCaseStep(const QUrl& arg_url, const TestCaseStep& arg_case_step)
+{
+	case_steps_.insert(arg_url, arg_case_step);
+}
+
+void TestCase::SetStopStep(const QString& arg_stop_step)
+{
+	stop_step_ = arg_stop_step;
 }
 
 const QUrl& TestCase::GetUrl(void)
@@ -26,9 +35,14 @@ const QUrl& TestCase::GetUrl(void)
 	return url_;
 }
 
+const bool& TestCase::CheckShowWebView(const ShowWebViewTime& arg_show_web_view_time)
+{
+	return show_web_view_time_ == arg_show_web_view_time;
+}
+
 const int& TestCase::GetRunningInterval(void)
 {
-	return RunningInterval;
+	return running_interval_;
 }
 
 const QString& TestCase::GetStopStep(void)
@@ -36,12 +50,22 @@ const QString& TestCase::GetStopStep(void)
 	return stop_step_;
 }
 
-bool TestCase::CheckStopStep(const QString& stop_step)
+bool TestCase::CheckStopStep(const QString& arg_url)
 {
-	return QString::compare(stop_step_, stop_step) == 0;
+	const QRegularExpressionMatch match = regex_url_.match(arg_url);
+	auto b = match.captured();
+	return QString::compare(stop_step_, match.captured()) == 0;
 }
 
-TestCaseStep TestCase::GetCaseStep(const QUrl& url)
+TestCaseStep TestCase::GetCaseStep(const QUrl& arg_url)
 {
-	return case_steps_.value(url);
+	return case_steps_.value(arg_url);
+}
+
+void TestCase::Log(const QString& arg_log, const LogType& arg_log_type)
+{
+	if (has_mapping_log_type_.value(arg_log_type) + has_mapping_log_level_.value(log_level_) > 0)
+	{
+		qDebug().noquote() << arg_log;
+	}
 }
