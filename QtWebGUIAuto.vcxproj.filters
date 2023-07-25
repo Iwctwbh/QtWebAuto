@@ -37,10 +37,10 @@
     <None Include="Scripts.json" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="test_case.h">
+    <ClInclude Include="test_case_step.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test_case_step.h">
+    <ClInclude Include="test_case.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

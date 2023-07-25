@@ -3,6 +3,7 @@
 #define TEST_CASE_H
 
 #include <QRegularExpression>
+#include <QWebEngineView>
 #include "test_case_step.h"
 
 class TestCase
@@ -26,17 +27,20 @@ public:
 	static void SetLogLevel(const QString&);
 	static void SetShowWebViewTime(const QString&);
 	static void SetRunningInterval(const int&);
+	static void InsertRunBeforeStep(const QString&);
 	static void InsertCaseStep(const QUrl&, const TestCaseStep&);
 	static void SetStopStep(const QString&);
 
 	static const QUrl& GetUrl(void);
-	static const bool& CheckShowWebView(const ShowWebViewTime&);
+	static bool CheckShowWebView(const ShowWebViewTime&);
 	static const int& GetRunningInterval(void);
+	static const QList<QString>& GetRunBeforeStep(void);
 	static const QString& GetStopStep(void);
 	static bool CheckStopStep(const QString&);
 	static TestCaseStep GetCaseStep(const QUrl&);
 
 	static void Log(const QString&, const LogType&);
+	static void CheckAndRun(const QWebEngineView&, const QString&);
 
 private:
 	enum LogLevel
@@ -84,8 +88,11 @@ private:
 	inline static LogLevel log_level_{};
 	inline static ShowWebViewTime show_web_view_time_{};
 	inline static int running_interval_{};
+	inline static QList<QString> list_run_before_step_{};
 	inline static QHash<QUrl, TestCaseStep> case_steps_{};
 	inline static QString stop_step_{};
 	inline static QRegularExpression regex_url_{R"(https?:\/\/[-\w\.\/]+)"};
+	inline static QRegularExpression regex_wait_{R"(^@{WAIT *?, *?\d+( *?, *?((.*?)|("?.*?)\"))?}@$)"};
+	inline static QRegularExpression regex_round_{R"(https?:\/\/[-\w\.\/]+)"};
 };
 #endif

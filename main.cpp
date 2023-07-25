@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QTest>
+#include <QMessageBox>
 #include "test_case.h"
 
 void check_true_exit(bool);
@@ -51,6 +52,10 @@ int main(int argc, char* argv[])
 	TestCase::SetLogLevel(json_object.value("LogLevel").toString());
 	TestCase::SetShowWebViewTime(json_object.value("ShowWebViewTime").toString());
 	TestCase::SetRunningInterval(json_object.value("RunningInterval").toInt());
+	std::ranges::for_each(json_object.value("RunBeforeStep").toArray(), [](const QJsonValue& v)
+		{
+			TestCase::InsertRunBeforeStep(v.toString());
+		});
 	TestCase::SetStopStep(json_object.value("StopStep").toString());
 
 	TestCase::Log(TestCase::GetUrl().toString(), TestCase::LogType::kUrl);
@@ -78,6 +83,7 @@ int main(int argc, char* argv[])
 	}
 #pragma endregion
 	QApplication app(argc, argv);
+	//QApplication::setQuitOnLastWindowClosed(false);
 	QWebEngineView web_view;
 	web_view.load(TestCase::GetUrl());
 	web_view.resize(1920, 1080);
@@ -90,7 +96,7 @@ int main(int argc, char* argv[])
 
 	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed]() -> void
 		{
-			TestCase::Log(web_view.url().toString() + "Page Load Completed", TestCase::LogType::kUrl);
+			TestCase::Log(web_view.url().toString() + " Page Load Completed", TestCase::LogType::kUrl);
 			// completed at stop step
 			if (TestCase::CheckStopStep(web_view.url().toString()))
 			{
@@ -102,12 +108,20 @@ int main(int argc, char* argv[])
 				}
 			}
 
+			// run before step
+			std::ranges::for_each(TestCase::GetRunBeforeStep(), [&web_view](const QString& s)
+				{
+					TestCase::CheckAndRun(web_view, s);
+					TestCase::Log("javascript: " + s, TestCase::LogType::kJavascript);
+					QTest::qWait(TestCase::GetRunningInterval());
+				});
+
 			// automatic run before stop step or is automatic is true
 			if (!is_completed || TestCase::GetCaseStep(web_view.url()).CheckIsAutomatic())
 			{
 				std::ranges::for_each(TestCase::GetCaseStep(web_view.url()).GetAutomatic(), [&web_view](const QString& s)
 					{
-						web_view.page()->runJavaScript(s);
+						TestCase::CheckAndRun(web_view, s);
 						TestCase::Log("javascript: " + s, TestCase::LogType::kJavascript);
 						QTest::qWait(TestCase::GetRunningInterval());
 					});
@@ -118,20 +132,12 @@ int main(int argc, char* argv[])
 			{
 				std::ranges::for_each(TestCase::GetCaseStep(web_view.url()).GetNonAutomatic(), [&web_view](const QString& s)
 					{
-						web_view.page()->runJavaScript(s);
+						TestCase::CheckAndRun(web_view, s);
 						TestCase::Log("javascript: " + s, TestCase::LogType::kJavascript);
 						QTest::qWait(TestCase::GetRunningInterval());
 					});
 			}
 		});
-
-	/*QTimer timer{};
-	timer.setSingleShot(true);
-	QObject::connect(&timer, &QTimer::timeout, [&view]()
-		{
-			view.show();
-		});
-	timer.start(5000);*/
 
 	return QApplication::exec();
 }
