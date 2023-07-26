@@ -4,6 +4,17 @@
 
 #include <QRegularExpression>
 #include <QWebEngineView>
+#include <QMessageBox>
+#include <QTimer>
+#include <QEventLoop>
+#include <QMouseEvent>
+#include <QApplication>
+#include <QInputMethodEvent>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
+#include <QGraphicsSceneMouseEvent>
+
 #include "test_case_step.h"
 
 class TestCase
@@ -13,7 +24,8 @@ public:
 	{
 		kLog,
 		kUrl,
-		kJavascript
+		kJavascript,
+		kEvent
 	};
 
 	enum ShowWebViewTime
@@ -30,6 +42,8 @@ public:
 	static void InsertRunBeforeStep(const QString&);
 	static void InsertCaseStep(const QUrl&, const TestCaseStep&);
 	static void SetStopStep(const QString&);
+	static void SetCountStopStep(const int&);
+	static void SetIsRecord(const bool&);
 
 	static const QUrl& GetUrl(void);
 	static bool CheckShowWebView(const ShowWebViewTime&);
@@ -38,9 +52,19 @@ public:
 	static const QString& GetStopStep(void);
 	static bool CheckStopStep(const QString&);
 	static TestCaseStep GetCaseStep(const QUrl&);
+	static const bool& CheckIsWait(void);
+	static const bool& CheckIsRecord(void);
+	static const bool& CheckIsEvent(void);
 
 	static void Log(const QString&, const LogType&);
 	static void CheckAndRun(const QWebEngineView&, const QString&);
+	static void SaveRecord(void);
+
+	inline static QUrl current_url_{};
+	inline static QList<QString> current_url_event_{};
+	inline static bool is_record_{};
+	inline static QJsonDocument json_document_{};
+	inline static QString file_name_{};
 
 private:
 	enum LogLevel
@@ -64,7 +88,8 @@ private:
 	{
 		{ kLog, 0 },
 		{ kUrl, 0 },
-		{ kJavascript, -1 }
+		{ kJavascript, -1 },
+		{ kEvent, -1 }
 	};
 
 	inline static const QHash<LogLevel, int> has_mapping_log_level_
@@ -91,8 +116,14 @@ private:
 	inline static QList<QString> list_run_before_step_{};
 	inline static QHash<QUrl, TestCaseStep> case_steps_{};
 	inline static QString stop_step_{};
+	inline static int count_stop_step_{};
 	inline static QRegularExpression regex_url_{R"(https?:\/\/[-\w\.\/]+)"};
-	inline static QRegularExpression regex_wait_{R"(^@{WAIT *?, *?\d+( *?, *?((.*?)|("?.*?)\"))?}@$)"};
+	inline static QRegularExpression regex_wait_{R"(^@{ *?WAIT *?, *?\d+( *?, *?((.*?)|("?.*?)\"))?}@$)"};
+	inline static QRegularExpression regex_coordinate_{R"(^@{ *?COORDINATE *?, *?\d+ *?, *?\d+ *?}@$)"};
+	inline static QRegularExpression regex_send_text_{R"(^@{ *?SEND_TEXT *?,.+?}@$)"};
+	inline static QRegularExpression regex_key_{R"(^@{ *?KEY *?, *?\d+ *?}@$)"};
 	inline static QRegularExpression regex_round_{R"(https?:\/\/[-\w\.\/]+)"};
+	inline static bool is_wait_{};
+	inline static bool is_event_{};
 };
 #endif

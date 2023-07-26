@@ -7,6 +7,8 @@
 #include <QJsonArray>
 #include <QTest>
 #include <QMessageBox>
+
+#include "event_eater.hpp"
 #include "test_case.h"
 
 void check_true_exit(bool);
@@ -44,6 +46,7 @@ int main(int argc, char* argv[])
 
 	QJsonParseError json_error{ QJsonParseError::NoError };
 	const QJsonDocument json_document{ QJsonDocument::fromJson(file_case_json.readAll(),&json_error) };
+	file_case_json.close();
 	check_true_exit(json_error.error != QJsonParseError::NoError || !json_document.isObject());
 
 	const QJsonObject json_object{ json_document.object() };
@@ -56,7 +59,12 @@ int main(int argc, char* argv[])
 		{
 			TestCase::InsertRunBeforeStep(v.toString());
 		});
-	TestCase::SetStopStep(json_object.value("StopStep").toString());
+	QJsonObject json_object_stop_step{ json_object.value("StopStep").toObject() };
+	TestCase::SetStopStep(json_object_stop_step.keys()[0]);
+	TestCase::SetCountStopStep(json_object_stop_step.value(json_object_stop_step.keys()[0]).toInt());
+	TestCase::SetIsRecord(json_object.value("Record").toBool());
+	TestCase::file_name_ = file_case_name;
+	TestCase::json_document_ = json_document;
 
 	TestCase::Log(TestCase::GetUrl().toString(), TestCase::LogType::kUrl);
 
@@ -94,9 +102,21 @@ int main(int argc, char* argv[])
 
 	bool is_completed{ false };
 
-	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed]() -> void
+	EventEater* event_eater{ new EventEater };
+
+	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed, &event_eater]() -> void
 		{
+			web_view.focusWidget()->installEventFilter(event_eater);
+
+			TestCase::current_url_ = web_view.url();
 			TestCase::Log(web_view.url().toString() + " Page Load Completed", TestCase::LogType::kUrl);
+
+			if (TestCase::CheckIsWait())
+			{
+				TestCase::Log("is wait", TestCase::LogType::kLog);
+				return;
+			}
+
 			// completed at stop step
 			if (TestCase::CheckStopStep(web_view.url().toString()))
 			{
