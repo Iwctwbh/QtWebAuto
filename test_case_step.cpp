@@ -20,6 +20,11 @@ void TestCaseStep::InsertNonAutomatic(const QString& arg_non_automatic)
 	list_non_automatic_.push_back(arg_non_automatic);
 }
 
+void TestCaseStep::ReplaceLastNonAutomatic(const QString& arg_non_automatic)
+{
+	list_non_automatic_.replace(list_non_automatic_.size() - 1, arg_non_automatic);
+}
+
 const QUrl& TestCaseStep::GetUrl(void) const
 {
 	return url_;

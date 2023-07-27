@@ -20,20 +20,21 @@
 class TestCase
 {
 public:
-	enum LogType
+	enum class LogType : int
 	{
-		kLog,
-		kUrl,
-		kJavascript,
-		kEvent
+		kLog = 1,
+		kUrl = 1,
+		kJavascript = 2,
+		kEvent = 2
 	};
 
-	enum ShowWebViewTime
+	enum class ShowWebViewTime : int
 	{
 		kNo,
 		kStart,
 		kCompleted
 	};
+	inline static const QRegularExpression regex_send_text_{R"(^@{ *?SEND_TEXT *?,.+?}@$)"};
 
 	static void SetUrl(const QUrl&);
 	static void SetLogLevel(const QString&);
@@ -69,9 +70,9 @@ public:
 private:
 	enum LogLevel
 	{
-		kNull,
-		kInfo,
-		kDebug
+		kNull = 0,
+		kInfo = 1,
+		kDebug = 2
 	};
 
 	inline static const QHash<QString, LogLevel> hash_log_level_
@@ -84,29 +85,14 @@ private:
 		{ "Debugger", kDebug }
 	};
 
-	inline static const QHash<LogType, int> has_mapping_log_type_
-	{
-		{ kLog, 0 },
-		{ kUrl, 0 },
-		{ kJavascript, -1 },
-		{ kEvent, -1 }
-	};
-
-	inline static const QHash<LogLevel, int> has_mapping_log_level_
-	{
-		{ kNull, 0 },
-		{ kInfo, 1 },
-		{ kDebug, 2 }
-	};
-
 	inline static const QHash<QString, ShowWebViewTime> has_show_web_view_time_
 	{
-		{ "start", kStart },
-		{ "Start", kStart },
-		{ "End", kCompleted },
-		{ "end", kCompleted },
-		{ "completed", kCompleted },
-		{ "Completed", kCompleted }
+		{ "start", ShowWebViewTime::kStart },
+		{ "Start", ShowWebViewTime::kStart },
+		{ "End", ShowWebViewTime::kCompleted },
+		{ "end", ShowWebViewTime::kCompleted },
+		{ "completed", ShowWebViewTime::kCompleted },
+		{ "Completed", ShowWebViewTime::kCompleted }
 	};
 
 	inline static QUrl url_{};
@@ -117,12 +103,11 @@ private:
 	inline static QHash<QUrl, TestCaseStep> case_steps_{};
 	inline static QString stop_step_{};
 	inline static int count_stop_step_{};
-	inline static QRegularExpression regex_url_{R"(https?:\/\/[-\w\.\/]+)"};
-	inline static QRegularExpression regex_wait_{R"(^@{ *?WAIT *?, *?\d+( *?, *?((.*?)|("?.*?)\"))?}@$)"};
-	inline static QRegularExpression regex_coordinate_{R"(^@{ *?COORDINATE *?, *?\d+ *?, *?\d+ *?}@$)"};
-	inline static QRegularExpression regex_send_text_{R"(^@{ *?SEND_TEXT *?,.+?}@$)"};
-	inline static QRegularExpression regex_key_{R"(^@{ *?KEY *?, *?\d+ *?}@$)"};
-	inline static QRegularExpression regex_round_{R"(https?:\/\/[-\w\.\/]+)"};
+	inline static const QRegularExpression regex_url_{R"(https?:\/\/[-\w\.\/]+)"};
+	inline static const QRegularExpression regex_wait_{R"(^@{ *?WAIT *?, *?\d+( *?, *?((.*?)|("?.*?)\"))?}@$)"};
+	inline static const QRegularExpression regex_coordinate_{R"(^@{ *?COORDINATE *?, *?\d+ *?, *?\d+ *?}@$)"};
+	inline static const QRegularExpression regex_key_{R"(^@{ *?KEY *?, *?\d+ *?}@$)"};
+	inline static const QRegularExpression regex_round_{R"(https?:\/\/[-\w\.\/]+)"};
 	inline static bool is_wait_{};
 	inline static bool is_event_{};
 };

@@ -10,6 +10,14 @@ bool operator==(A a, B b)
 	return a == static_cast<A>(b);
 }
 
+template<typename A, typename B,
+	std::enable_if_t<std::is_integral_v<A> || std::is_enum_v<A>>* = nullptr,
+	std::enable_if_t<std::is_enum_v<B> || std::is_integral_v<B>>* = nullptr>
+bool operator>=(A a, B b)
+{
+	return a >= static_cast<A>(b);
+}
+
 void TestCase::SetUrl(const QUrl& arg_url)
 {
 	url_ = arg_url;
@@ -121,7 +129,7 @@ const bool& TestCase::CheckIsEvent(void)
 
 void TestCase::Log(const QString& arg_log, const LogType& arg_log_type)
 {
-	if (has_mapping_log_type_.value(arg_log_type) + has_mapping_log_level_.value(log_level_) > 0)
+	if (operator>=(log_level_, arg_log_type))
 	{
 		qDebug().noquote() << arg_log;
 	}
@@ -180,10 +188,14 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 		// Take Y
 		const int y{ list_command.takeLast().toInt() };
 
+		//QCursor::setPos(x, y);
 		// Sent Event
 		is_event_ = true;
-		QMouseEvent event{ QMouseEvent::Type::MouseButtonPress, QPoint {x, y}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier };
-		QApplication::sendEvent(arg_view.focusWidget(), &event);
+		QMouseEvent event_press{ QMouseEvent::Type::MouseButtonPress, QPoint {x, y}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier };
+		QMouseEvent event_release{ QMouseEvent::Type::MouseButtonRelease, QPoint {x, y}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier };
+
+		QApplication::sendEvent(arg_view.focusWidget(), &event_press);
+		QApplication::sendEvent(arg_view.focusWidget(), &event_release);
 		is_event_ = false;
 	}
 	else if (match = regex_send_text_.match(arg_command.trimmed()); match.hasMatch())
@@ -194,9 +206,13 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 		list_command.removeFirst();
 		foreach(QString s, QString{ list_command.join(',').trimmed().remove(QRegularExpression(R"(^")")).remove(QRegularExpression(R"("$)")) })
 		{
+			// Sent Event
 			is_event_ = true;
-			QKeyEvent event{ QKeyEvent::Type::KeyPress, s.at(0).unicode(), Qt::NoModifier, s };
-			QApplication::sendEvent(arg_view.focusWidget(), &event);
+			QKeyEvent event_press{ QKeyEvent::Type::KeyPress, s.at(0).unicode(), Qt::NoModifier, s };
+			QKeyEvent event_release{ QKeyEvent::Type::KeyRelease, s.at(0).unicode(), Qt::NoModifier };
+
+			QApplication::sendEvent(arg_view.focusWidget(), &event_press);
+			QApplication::sendEvent(arg_view.focusWidget(), &event_release);
 			is_event_ = false;
 		}
 	}
@@ -209,9 +225,13 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 
 		// Take KeyCode
 		int key = list_command.takeFirst().trimmed().toInt();
+
+		// Sent Event
 		is_event_ = true;
-		QKeyEvent event{ QKeyEvent::Type::KeyPress, key, Qt::NoModifier };
-		QApplication::sendEvent(arg_view.focusWidget(), &event);
+		QKeyEvent event_press{ QKeyEvent::Type::KeyPress, key, Qt::NoModifier };
+		QKeyEvent event_release{ QKeyEvent::Type::KeyPress, key, Qt::NoModifier };
+		QApplication::sendEvent(arg_view.focusWidget(), &event_press);
+		QApplication::sendEvent(arg_view.focusWidget(), &event_release);
 		is_event_ = false;
 	}
 	else

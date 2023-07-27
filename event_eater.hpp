@@ -25,7 +25,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 		if (!TestCase::CheckIsEvent())
 		{
 			const QMouseEvent* mouse_event = dynamic_cast<QMouseEvent*>(event);
-			TestCase::Log("Mouse pressed " + QString::number(mouse_event->pos().x()) + "," + QString::number(mouse_event->pos().y()), TestCase::kEvent);
+			TestCase::Log("Mouse pressed " + QString::number(mouse_event->pos().x()) + "," + QString::number(mouse_event->pos().y()), TestCase::LogType::kEvent);
 			if (TestCase::is_record_)
 			{
 				TestCaseStep case_step{ TestCase::GetCaseStep(TestCase::current_url_) };
@@ -43,7 +43,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 		{
 			const QKeyEvent* key_event{ dynamic_cast<QKeyEvent*>(event) };
 
-			TestCase::Log("Key pressed " + key_event->text(), TestCase::kEvent);
+			TestCase::Log("Key pressed " + key_event->text(), TestCase::LogType::kEvent);
 			if (TestCase::is_record_)
 			{
 				TestCaseStep case_step{ TestCase::GetCaseStep(TestCase::current_url_) };
@@ -82,7 +82,26 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 					case_step.InsertNonAutomatic("@{KEY, " + QString::number(key_event->key()) + "}@");
 					break;
 				default:
-					case_step.InsertNonAutomatic("@{SEND_TEXT, \"" + key_event->text() + "\"}@");
+					QList<QString> non_automatic{ case_step.GetNonAutomatic() };
+					const QString last_non_automatic{ non_automatic.takeLast() };
+					if (const QRegularExpressionMatch match{ TestCase::regex_send_text_.match(last_non_automatic.trimmed()) }; match.hasMatch())
+					{
+						QList<QString> list_command{ match.captured().trimmed().remove(0, 2).remove(QRegularExpression("}@$")).split(',') };
+
+						// Remove SEN_TEXT
+						list_command.removeFirst();
+
+						// Take Text
+						const QString text{ list_command.join(',').trimmed().remove(QRegularExpression(R"(^")")).remove(QRegularExpression(R"("$)")) };
+
+						const QString new_last_non_automatic{ text + key_event->text() };
+
+						case_step.ReplaceLastNonAutomatic("@{SEND_TEXT, \"" + new_last_non_automatic + "\"}@");
+					}
+					else
+					{
+						case_step.InsertNonAutomatic("@{SEND_TEXT, \"" + key_event->text() + "\"}@");
+					}
 					break;
 				}
 				TestCase::InsertCaseStep(TestCase::current_url_, case_step);

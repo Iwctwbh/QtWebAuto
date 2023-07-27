@@ -10,6 +10,7 @@ public:
 	void SetIsAutomatic(const bool&);
 	void InsertAutomatic(const QString&);
 	void InsertNonAutomatic(const QString&);
+	void ReplaceLastNonAutomatic(const QString&);
 
 	[[nodiscard]] const QUrl& GetUrl(void) const;
 	[[nodiscard]] const bool& CheckIsAutomatic(void) const;
