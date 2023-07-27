@@ -93,21 +93,25 @@ int main(int argc, char* argv[])
 	QApplication app(argc, argv);
 	//QApplication::setQuitOnLastWindowClosed(false);
 	QWebEngineView web_view;
+
+	TestCase::web_view_ = &web_view;
+
 	web_view.load(TestCase::GetUrl());
 	web_view.resize(1920, 1080);
 	if (TestCase::CheckShowWebView(TestCase::ShowWebViewTime::kStart))
 	{
 		web_view.show();
+		TestCase::web_view_parent_ = web_view.focusWidget();
+		TestCase::web_view_widget_ = web_view.focusWidget();
 	}
 
 	bool is_completed{ false };
 
 	EventEater* event_eater{ new EventEater };
+	web_view.focusWidget()->installEventFilter(event_eater);
 
 	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed, &event_eater]() -> void
 		{
-			web_view.focusWidget()->installEventFilter(event_eater);
-
 			TestCase::current_url_ = web_view.url();
 			TestCase::Log(web_view.url().toString() + " Page Load Completed", TestCase::LogType::kUrl);
 

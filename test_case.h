@@ -66,6 +66,9 @@ public:
 	inline static bool is_record_{};
 	inline static QJsonDocument json_document_{};
 	inline static QString file_name_{};
+	inline static QWebEngineView* web_view_{};
+	inline static QWidget* web_view_widget_{};
+	inline static QWidget* web_view_parent_{};
 
 private:
 	enum LogLevel

@@ -194,8 +194,8 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 		QMouseEvent event_press{ QMouseEvent::Type::MouseButtonPress, QPoint {x, y}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier };
 		QMouseEvent event_release{ QMouseEvent::Type::MouseButtonRelease, QPoint {x, y}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier };
 
-		QApplication::sendEvent(arg_view.focusWidget(), &event_press);
-		QApplication::sendEvent(arg_view.focusWidget(), &event_release);
+		QApplication::sendEvent(web_view_widget_, &event_press);
+		QApplication::sendEvent(web_view_widget_, &event_release);
 		is_event_ = false;
 	}
 	else if (match = regex_send_text_.match(arg_command.trimmed()); match.hasMatch())
@@ -231,7 +231,7 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 		QKeyEvent event_press{ QKeyEvent::Type::KeyPress, key, Qt::NoModifier };
 		QKeyEvent event_release{ QKeyEvent::Type::KeyPress, key, Qt::NoModifier };
 		QApplication::sendEvent(arg_view.focusWidget(), &event_press);
-		QApplication::sendEvent(arg_view.focusWidget(), &event_release);
+		//QApplication::sendEvent(arg_view.focusWidget(), &event_release);
 		is_event_ = false;
 	}
 	else
