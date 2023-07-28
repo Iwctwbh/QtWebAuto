@@ -101,8 +101,8 @@ int main(int argc, char* argv[])
 	if (TestCase::CheckShowWebView(TestCase::ShowWebViewTime::kStart))
 	{
 		web_view.show();
-		TestCase::web_view_parent_ = web_view.focusWidget();
-		TestCase::web_view_widget_ = web_view.focusWidget();
+		TestCase::web_view_default_widget_ = TestCase::GetWebViewWidget();
+		TestCase::web_view_widget_ = TestCase::web_view_default_widget_;
 	}
 
 	bool is_completed{ false };

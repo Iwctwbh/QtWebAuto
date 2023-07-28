@@ -26,15 +26,11 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 			if (!TestCase::CheckIsEvent())
 			{
 				const QMouseEvent* mouse_event = dynamic_cast<QMouseEvent*>(event);
-				TestCase::Log(
-					"Mouse pressed " + QString::number(mouse_event->pos().x()) + "," + QString::number(
-						mouse_event->pos().y()), TestCase::LogType::kEvent);
+				TestCase::Log("Mouse pressed " + QString::number(mouse_event->pos().x()) + ", " + QString::number(mouse_event->pos().y()), TestCase::LogType::kEvent);
 				if (TestCase::is_record_)
 				{
 					TestCaseStep case_step{ TestCase::GetCaseStep(TestCase::current_url_) };
-					case_step.InsertNonAutomatic(
-						"@{COORDINATE, " + QString::number(mouse_event->pos().x()) + ", " + QString::number(
-							mouse_event->pos().y()) + "}@");
+					case_step.InsertNonAutomatic("@{COORDINATE, " + QString::number(mouse_event->pos().x()) + ", " + QString::number(mouse_event->pos().y()) + "}@");
 					TestCase::InsertCaseStep(TestCase::current_url_, case_step);
 					TestCase::SaveRecord();
 				}
@@ -48,7 +44,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 			{
 				if (QWidget * widget{ qobject_cast<QWidget*>(object) })
 				{
-					if (widget != TestCase::web_view_parent_)
+					if (widget != TestCase::web_view_default_widget_)
 					{
 						//widget->removeEventFilter(this);
 						widget->installEventFilter(this);
@@ -68,7 +64,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 				{
 					if (const QQuickWidget * widget{ qobject_cast<QQuickWidget*>(object) })
 					{
-						if (widget != TestCase::web_view_parent_)
+						if (widget != TestCase::web_view_default_widget_)
 						{
 							flag = false;
 						}
@@ -76,7 +72,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 				}
 				if (flag)
 				{
-					TestCase::web_view_widget_ = TestCase::web_view_parent_;
+					TestCase::web_view_widget_ = TestCase::web_view_default_widget_;
 				}
 			}
 			break;
@@ -105,7 +101,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 						case Qt::Key_End:
 						case Qt::Key_PageUp:
 						case Qt::Key_PageDown:
-						case Qt::Key_Shift:
+							//case Qt::Key_Shift:
 						case Qt::Key_Control:
 						case Qt::Key_Alt:
 						case Qt::Key_Meta:
@@ -129,9 +125,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 						default:
 							QList<QString> non_automatic{ case_step.GetNonAutomatic() };
 							const QString last_non_automatic{ non_automatic.takeLast() };
-							if (const QRegularExpressionMatch match{
-								TestCase::regex_send_text_.match(last_non_automatic.trimmed())
-								}; match.hasMatch())
+							if (const QRegularExpressionMatch match{ TestCase::regex_send_text_.match(last_non_automatic.trimmed()) }; match.hasMatch())
 							{
 								QList<QString> list_command{
 									match.captured().trimmed().remove(0, 2).remove(QRegularExpression("}@$")).split(',')
@@ -163,9 +157,37 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 			return false;
 		}
 
+		case QEvent::Wheel:
+		{
+			qDebug() << event;
+			if (!TestCase::CheckIsEvent())
+			{
+				const QWheelEvent* wheel_event = dynamic_cast<QWheelEvent*>(event);
+				QString wheel_position{ QString::number(wheel_event->position().x()) + "," + QString::number(wheel_event->position().y()) };
+				wheel_event->angleDelta().y() > 0 ? TestCase::Log("scroll up " + wheel_position, TestCase::LogType::kEvent) : TestCase::Log("scroll down " + wheel_position, TestCase::LogType::kEvent);
+				if (TestCase::is_record_)
+				{
+					TestCaseStep case_step{ TestCase::GetCaseStep(TestCase::current_url_) };
+					case_step.InsertNonAutomatic("@{SCROLL, "
+						+ QString::number(wheel_event->position().x()) + ", "
+						+ QString::number(wheel_event->position().y()) + ", "
+						+ QString::number(wheel_event->globalPosition().x()) + ", "
+						+ QString::number(wheel_event->globalPosition().y()) + ", "
+						+ QString::number(wheel_event->pixelDelta().x()) + ", "
+						+ QString::number(wheel_event->pixelDelta().y()) + ", "
+						+ QString::number(wheel_event->angleDelta().x()) + ", "
+						+ QString::number(wheel_event->angleDelta().y()) + "}@");
+					TestCase::InsertCaseStep(TestCase::current_url_, case_step);
+					TestCase::SaveRecord();
+				}
+			}
+			return false;
+		}
+
 		default:
 			// standard event processing
 			return QObject::eventFilter(obj, event);
 	}
+	return false;
 }
 #endif

@@ -127,6 +127,18 @@ const bool& TestCase::CheckIsEvent(void)
 	return is_event_;
 }
 
+QWidget* TestCase::GetWebViewWidget()
+{
+	foreach(QObject * object, TestCase::web_view_->children())
+	{
+		if (QQuickWidget * widget{ qobject_cast<QQuickWidget*>(object) })
+		{
+			return widget;
+		}
+	}
+	return nullptr;
+}
+
 void TestCase::Log(const QString& arg_log, const LogType& arg_log_type)
 {
 	if (operator>=(log_level_, arg_log_type))
@@ -211,8 +223,8 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 			QKeyEvent event_press{ QKeyEvent::Type::KeyPress, s.at(0).unicode(), Qt::NoModifier, s };
 			QKeyEvent event_release{ QKeyEvent::Type::KeyRelease, s.at(0).unicode(), Qt::NoModifier };
 
-			QApplication::sendEvent(arg_view.focusWidget(), &event_press);
-			QApplication::sendEvent(arg_view.focusWidget(), &event_release);
+			QApplication::sendEvent(web_view_widget_, &event_press);
+			QApplication::sendEvent(web_view_widget_, &event_release);
 			is_event_ = false;
 		}
 	}
@@ -230,8 +242,30 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 		is_event_ = true;
 		QKeyEvent event_press{ QKeyEvent::Type::KeyPress, key, Qt::NoModifier };
 		QKeyEvent event_release{ QKeyEvent::Type::KeyPress, key, Qt::NoModifier };
-		QApplication::sendEvent(arg_view.focusWidget(), &event_press);
-		//QApplication::sendEvent(arg_view.focusWidget(), &event_release);
+		QApplication::sendEvent(web_view_widget_, &event_press);
+		is_event_ = false;
+	}
+	else if (match = regex_scroll_.match(arg_command.trimmed()); match.hasMatch())
+	{
+		QList<QString> list_command{ match.captured().trimmed().remove(0, 2).remove(QRegularExpression("}@$")).split(',') };
+
+		// Remove SCROLL
+		list_command.removeFirst();
+
+		// Take KeyCode
+		int x{ list_command.takeFirst().trimmed().toInt() };
+		int y{ list_command.takeFirst().trimmed().toInt() };
+		int global_x{ list_command.takeFirst().trimmed().toInt() };
+		int global_y{ list_command.takeFirst().trimmed().toInt() };
+		int pixel_delta_x{ list_command.takeFirst().trimmed().toInt() };
+		int pixel_delta_y{ list_command.takeFirst().trimmed().toInt() };
+		int angle_delta_x{ list_command.takeFirst().trimmed().toInt() };
+		int angle_delta_y{ list_command.takeFirst().trimmed().toInt() };
+
+		// Sent Event
+		is_event_ = true;
+		QWheelEvent event_wheel{ QPoint{x,y},QPoint{global_x,global_y},QPoint{pixel_delta_x,pixel_delta_y},QPoint{angle_delta_x,angle_delta_y},Qt::NoButton,Qt::NoModifier,Qt::NoScrollPhase,false };
+		QApplication::sendEvent(web_view_widget_, &event_wheel);
 		is_event_ = false;
 	}
 	else

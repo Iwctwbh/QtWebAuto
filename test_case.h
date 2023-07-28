@@ -14,6 +14,7 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QGraphicsSceneMouseEvent>
+#include <QQuickWidget>
 
 #include "test_case_step.h"
 
@@ -56,6 +57,7 @@ public:
 	static const bool& CheckIsWait(void);
 	static const bool& CheckIsRecord(void);
 	static const bool& CheckIsEvent(void);
+	static QWidget* GetWebViewWidget(void);
 
 	static void Log(const QString&, const LogType&);
 	static void CheckAndRun(const QWebEngineView&, const QString&);
@@ -68,7 +70,7 @@ public:
 	inline static QString file_name_{};
 	inline static QWebEngineView* web_view_{};
 	inline static QWidget* web_view_widget_{};
-	inline static QWidget* web_view_parent_{};
+	inline static QWidget* web_view_default_widget_{};
 
 private:
 	enum LogLevel
@@ -110,7 +112,7 @@ private:
 	inline static const QRegularExpression regex_wait_{R"(^@{ *?WAIT *?, *?\d+( *?, *?((.*?)|("?.*?)\"))?}@$)"};
 	inline static const QRegularExpression regex_coordinate_{R"(^@{ *?COORDINATE *?, *?\d+ *?, *?\d+ *?}@$)"};
 	inline static const QRegularExpression regex_key_{R"(^@{ *?KEY *?, *?\d+ *?}@$)"};
-	inline static const QRegularExpression regex_round_{R"(https?:\/\/[-\w\.\/]+)"};
+	inline static const QRegularExpression regex_scroll_{R"(^@{ *?SCROLL *?(, *?-?\d+ *?){8}}@$)"};
 	inline static bool is_wait_{};
 	inline static bool is_event_{};
 };
