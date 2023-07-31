@@ -57,7 +57,7 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 
 		case QEvent::FocusIn:
 		{
-			if (TestCase::web_view_widget_ != TestCase::web_view_->focusWidget())
+			if (TestCase::web_view_widget_ != TestCase::web_view_default_widget_)
 			{
 				bool flag{ true };
 				foreach(QObject * object, TestCase::web_view_->children())
@@ -91,6 +91,9 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 
 					switch (key_event->key())
 					{
+						case Qt::Key_Shift:
+						case Qt::Key_CapsLock:
+							break;
 						case Qt::Key_Backspace:
 						case Qt::Key_Delete:
 						case Qt::Key_Left:
@@ -101,11 +104,9 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 						case Qt::Key_End:
 						case Qt::Key_PageUp:
 						case Qt::Key_PageDown:
-							//case Qt::Key_Shift:
 						case Qt::Key_Control:
 						case Qt::Key_Alt:
 						case Qt::Key_Meta:
-						case Qt::Key_CapsLock:
 						case Qt::Key_NumLock:
 						case Qt::Key_ScrollLock:
 						case Qt::Key_F1:

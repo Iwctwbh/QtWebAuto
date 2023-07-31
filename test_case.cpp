@@ -58,11 +58,6 @@ void TestCase::SetCountStopStep(const int& arg_count_stop_step)
 	count_stop_step_ = arg_count_stop_step;
 }
 
-void TestCase::SetIsRecord(const bool& arg_is_record)
-{
-	is_record_ = arg_is_record;
-}
-
 const QUrl& TestCase::GetUrl(void)
 {
 	return url_;
@@ -115,11 +110,6 @@ TestCaseStep TestCase::GetCaseStep(const QUrl& arg_url)
 const bool& TestCase::CheckIsWait(void)
 {
 	return is_wait_;
-}
-
-const bool& TestCase::CheckIsRecord(void)
-{
-	return is_record_;
 }
 
 const bool& TestCase::CheckIsEvent(void)

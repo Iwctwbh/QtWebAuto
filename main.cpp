@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 	QJsonObject json_object_stop_step{ json_object.value("StopStep").toObject() };
 	TestCase::SetStopStep(json_object_stop_step.keys()[0]);
 	TestCase::SetCountStopStep(json_object_stop_step.value(json_object_stop_step.keys()[0]).toInt());
-	TestCase::SetIsRecord(json_object.value("Record").toBool());
+	TestCase::is_record_ = json_object.value("Record").toBool();
 	TestCase::file_name_ = file_case_name;
 	TestCase::json_document_ = json_document;
 
@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
 	TestCase::web_view_ = &web_view;
 
 	web_view.load(TestCase::GetUrl());
+	TestCase::current_url_ = TestCase::GetUrl();
 	web_view.resize(1920, 1080);
 	if (TestCase::CheckShowWebView(TestCase::ShowWebViewTime::kStart))
 	{
@@ -108,11 +109,15 @@ int main(int argc, char* argv[])
 	bool is_completed{ false };
 
 	EventEater* event_eater{ new EventEater };
-	web_view.focusWidget()->installEventFilter(event_eater);
+	TestCase::web_view_default_widget_->installEventFilter(event_eater);
+
+	QObject::connect(&web_view, &QWebEngineView::urlChanged, [&web_view]()->void
+		{
+			TestCase::current_url_ = web_view.url();
+		});
 
 	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed, &event_eater]() -> void
 		{
-			TestCase::current_url_ = web_view.url();
 			TestCase::Log(web_view.url().toString() + " Page Load Completed", TestCase::LogType::kUrl);
 
 			if (TestCase::CheckIsWait())

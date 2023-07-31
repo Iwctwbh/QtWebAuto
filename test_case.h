@@ -45,7 +45,6 @@ public:
 	static void InsertCaseStep(const QUrl&, const TestCaseStep&);
 	static void SetStopStep(const QString&);
 	static void SetCountStopStep(const int&);
-	static void SetIsRecord(const bool&);
 
 	static const QUrl& GetUrl(void);
 	static bool CheckShowWebView(const ShowWebViewTime&);
@@ -55,7 +54,6 @@ public:
 	static bool CheckStopStep(const QString&);
 	static TestCaseStep GetCaseStep(const QUrl&);
 	static const bool& CheckIsWait(void);
-	static const bool& CheckIsRecord(void);
 	static const bool& CheckIsEvent(void);
 	static QWidget* GetWebViewWidget(void);
 
