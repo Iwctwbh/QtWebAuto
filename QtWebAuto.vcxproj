@@ -66,6 +66,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -103,19 +104,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="test_case.cpp" />
-    <ClCompile Include="test_case_step.cpp" />
+    <ClCompile Include="src\capture_in_real_time.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\test_case.cpp" />
+    <ClCompile Include="src\test_case_step.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="event_eater.hpp" />
+    <QtMoc Include="src\event_eater.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="test_case.h" />
-    <ClInclude Include="test_case_step.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Scripts.json" />
+    <QtMoc Include="src\capture_in_real_time.h" />
+    <ClInclude Include="src\common_tools.hpp" />
+    <ClInclude Include="src\image_identification.hpp" />
+    <ClInclude Include="src\request_Interceptor.hpp" />
+    <ClInclude Include="src\test_case.h" />
+    <ClInclude Include="src\test_case_step.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

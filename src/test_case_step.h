@@ -3,7 +3,7 @@
 #define TEST_CASE_STEP_H
 
 #include <QUrl>
-class TestCaseStep
+class TestCaseStep final
 {
 public:
 	void SetUrl(const QUrl&);

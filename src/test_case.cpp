@@ -38,6 +38,11 @@ void TestCase::SetRunningInterval(const int& arg_interval)
 	running_interval_ = arg_interval;
 }
 
+void TestCase::SetCursorFollow(const bool& arg_is_cursor_follow)
+{
+	is_cursor_follow_ = arg_is_cursor_follow;
+}
+
 void TestCase::InsertRunBeforeStep(const QString& arg_run_before_step)
 {
 	list_run_before_step_.push_back(arg_run_before_step);
@@ -175,7 +180,7 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 		is_wait_ = true;
 		event_loop.exec();
 		is_wait_ = false;
-		msg_box->deleteLater();
+		//msg_box->deleteLater();
 	}
 	else if (match = regex_coordinate_.match(arg_command.trimmed()); match.hasMatch())
 	{
@@ -190,7 +195,10 @@ void TestCase::CheckAndRun(const QWebEngineView& arg_view, const QString& arg_co
 		// Take Y
 		const int y{ list_command.takeLast().toInt() };
 
-		//QCursor::setPos(x, y);
+		if (is_cursor_follow_)
+		{
+			QCursor::setPos(x, y);
+		}
 		// Sent Event
 		is_event_ = true;
 		QMouseEvent event_press{ QMouseEvent::Type::MouseButtonPress, QPoint {x, y}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier };

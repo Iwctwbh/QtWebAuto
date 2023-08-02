@@ -18,7 +18,7 @@
 
 #include "test_case_step.h"
 
-class TestCase
+class TestCase final
 {
 public:
 	enum class LogType : int
@@ -41,6 +41,7 @@ public:
 	static void SetLogLevel(const QString&);
 	static void SetShowWebViewTime(const QString&);
 	static void SetRunningInterval(const int&);
+	static void SetCursorFollow(const bool&);
 	static void InsertRunBeforeStep(const QString&);
 	static void InsertCaseStep(const QUrl&, const TestCaseStep&);
 	static void SetStopStep(const QString&);
@@ -102,6 +103,7 @@ private:
 	inline static LogLevel log_level_{};
 	inline static ShowWebViewTime show_web_view_time_{};
 	inline static int running_interval_{};
+	inline static bool is_cursor_follow_{};
 	inline static QList<QString> list_run_before_step_{};
 	inline static QHash<QUrl, TestCaseStep> case_steps_{};
 	inline static QString stop_step_{};

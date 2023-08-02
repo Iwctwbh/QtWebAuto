@@ -7,8 +7,14 @@
 #include <QJsonArray>
 #include <QTest>
 #include <QMessageBox>
+#include <QWebEngineProfile>
+#include <QPixmap>
+#include <QThread>
 
+#include "capture_in_real_time.h"
 #include "event_eater.hpp"
+#include "request_Interceptor.hpp"
+#include "image_identification.hpp"
 #include "test_case.h"
 
 void check_true_exit(bool);
@@ -16,6 +22,9 @@ void check_false_exit(bool);
 
 int main(int argc, char* argv[])
 {
+	QApplication app(argc, argv);
+	//QApplication::setQuitOnLastWindowClosed(false);
+
 #pragma region 获取文件列表
 	const QDir dir{ "." };
 	QStringList list_files{ dir.entryList(QStringList{ "*.json" }, QDir::Files) };
@@ -55,6 +64,7 @@ int main(int argc, char* argv[])
 	TestCase::SetLogLevel(json_object.value("LogLevel").toString());
 	TestCase::SetShowWebViewTime(json_object.value("ShowWebViewTime").toString());
 	TestCase::SetRunningInterval(json_object.value("RunningInterval").toInt());
+	TestCase::SetCursorFollow(json_object.value("CursorFollow").toBool());
 	std::ranges::for_each(json_object.value("RunBeforeStep").toArray(), [](const QJsonValue& v)
 		{
 			TestCase::InsertRunBeforeStep(v.toString());
@@ -90,8 +100,6 @@ int main(int argc, char* argv[])
 		TestCase::InsertCaseStep(iterator.key(), case_step);
 	}
 #pragma endregion
-	QApplication app(argc, argv);
-	//QApplication::setQuitOnLastWindowClosed(false);
 	QWebEngineView web_view;
 
 	TestCase::web_view_ = &web_view;
@@ -116,8 +124,21 @@ int main(int argc, char* argv[])
 			TestCase::current_url_ = web_view.url();
 		});
 
-	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed, &event_eater]() -> void
+	RequestInterceptor* request_interceptor{ new RequestInterceptor(&web_view) };
+
+	QThread* sub{ new QThread };
+	CaptureInRealTime* work{ new CaptureInRealTime };
+	work->moveToThread(sub);
+	sub->start();
+
+	QTimer timer;
+	timer.setInterval(1000);
+	QObject::connect(&timer, &QTimer::timeout, work, &CaptureInRealTime::CaptureScreenShot);
+	timer.start();
+
+	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed, &request_interceptor]() -> void
 		{
+			//web_view.page()->profile()->setUrlRequestInterceptor(request_interceptor);
 			TestCase::Log(web_view.url().toString() + " Page Load Completed", TestCase::LogType::kUrl);
 
 			if (TestCase::CheckIsWait())

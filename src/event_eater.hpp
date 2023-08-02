@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef EVENT_EATER_HPP
 #define EVENT_EATER_HPP
 
@@ -83,6 +83,31 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 			if (!TestCase::CheckIsEvent())
 			{
 				const QKeyEvent* key_event{ dynamic_cast<QKeyEvent*>(event) };
+
+				/*if (key_event->matches(QKeySequence::Copy))
+				{
+					qDebug() << "Copy";
+				}
+				if (key_event->matches(QKeySequence::Paste))
+				{
+					qDebug() << "Paste";
+				}
+				if (key_event->matches(QKeySequence::Cut))
+				{
+					qDebug() << "Cut";
+				}
+				if (key_event->matches(QKeySequence::Undo))
+				{
+					qDebug() << "Undo";
+				}
+				if (key_event->matches(QKeySequence::Redo))
+				{
+					qDebug() << "Redo";
+				}
+				if (key_event->matches(QKeySequence::SelectAll))
+				{
+					qDebug() << "SelectAll";
+				}*/
 
 				TestCase::Log("Key pressed " + key_event->text(), TestCase::LogType::kEvent);
 				if (TestCase::is_record_)
