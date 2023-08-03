@@ -70,6 +70,8 @@ public:
 	inline static QWebEngineView* web_view_{};
 	inline static QWidget* web_view_widget_{};
 	inline static QWidget* web_view_default_widget_{};
+	inline static bool is_image_identification_{};
+	inline static QString folder_path_image_identification_{};
 
 private:
 	enum LogLevel

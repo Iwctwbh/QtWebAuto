@@ -7,7 +7,7 @@
 class ImageIdentification
 {
 public:
-	static void FindPositions(const cv::Mat& arg_large_image, const cv::Mat& arg_small_image)
+	static bool FindPositions(const cv::Mat& arg_large_image, const cv::Mat& arg_small_image, const double arg_min_similarity = 0.5)
 	{
 		cv::Mat large_image = arg_large_image.clone();
 		cv::Mat small_image = arg_small_image.clone();
@@ -29,17 +29,16 @@ public:
 		cv::Point min_loc, max_loc;
 		cv::minMaxLoc(res, &min_val, &max_val, &min_loc, &max_loc);
 
-		qDebug() << "min_val:" << min_val;
-		qDebug() << "max_val:" << max_val;
+		//qDebug() << "min_val:" << min_val;
+		//qDebug() << "max_val:" << max_val;
 
-		if (max_val < 0.5)
+		if (max_val < arg_min_similarity)
 		{
-			std::cout << "Not Found" << std::endl;
-			return;
+			return false;
 		}
 		else
 		{
-			std::cout << "------------------------Found!!!!!!!!!!!!!-----------------------------" << std::endl;
+			return true;
 		}
 
 		const cv::Point top_left = max_loc;

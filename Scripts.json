@@ -1,23 +1,16 @@
 ﻿{
-  "Url": "https://www.baidu.com/",
-  "Running-Interval": 100,
-  "Steps": {
-    "https://www.baidu.com/": {
-      "IsAutomatic": true,
-      "Automatic": [
-        "$(\"#kw\").val(\"https://github.com/Iwctwbh\")",
-        "$(\"#su\").click()\""
-      ],
-      "Non-Automatic": [
-        "$(\"button[type=submit]\").trigger(\"click\");"
-      ]
-    },
-    "https://github.com/Iwctwbh": {
-      "IsAutomatic": false,
-      "Non-Automatic": [
-        ""
-      ]
-    }
+  "Url": "",
+  "LogLevel": "Debug",
+  "ShowWebViewTime": "start",
+  "RunningInterval": 100,
+  "Record": false,
+  "ImageIdentification": {
+    "Enable": true,
+    "TimeInterval": 1000,
+    "ImageFolder": "resources",
+    "MinSimilarity": 0.5
   },
-  "StopStep": ""
+  "Steps": {
+  },
+  "StopStep": { "": 2 }
 }

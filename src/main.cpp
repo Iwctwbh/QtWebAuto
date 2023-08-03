@@ -17,8 +17,8 @@
 #include "image_identification.hpp"
 #include "test_case.h"
 
-void check_true_exit(bool);
-void check_false_exit(bool);
+void check_true_exit(const bool&, const QString&);
+void check_false_exit(const bool&, const QString&);
 
 int main(int argc, char* argv[])
 {
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 #pragma region 获取文件列表
 	const QDir dir{ "." };
 	QStringList list_files{ dir.entryList(QStringList{ "*.json" }, QDir::Files) };
-	check_true_exit(list_files.length() < 1);
+	check_true_exit(list_files.length() < 1, "No Json.");
 	QString file_case_name{ list_files.value(0) };
 
 	if (int count = 0; list_files.length() > 1)
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 				qDebug().noquote() << count++ << ":" << s;
 			});
 #pragma region 选择Case，获取输入
-		qDebug().noquote() << "Enter Number To Continue:";
+		qDebug().noquote() << "Enter number to continue:";
 		QTextStream stream{ stdin };
 		const int id_case = stream.readLine().toInt();
 		file_case_name = list_files.value(id_case);
@@ -50,13 +50,13 @@ int main(int argc, char* argv[])
 
 #pragma region 读取Case的Json文件
 	QFile file_case_json{ file_case_name };
-	check_false_exit(file_case_json.open(QIODevice::ReadOnly));
+	check_false_exit(file_case_json.open(QIODevice::ReadOnly), "Can't open file.");
 	qDebug().noquote() << "Load " + file_case_name;
 
 	QJsonParseError json_error{ QJsonParseError::NoError };
 	const QJsonDocument json_document{ QJsonDocument::fromJson(file_case_json.readAll(),&json_error) };
 	file_case_json.close();
-	check_true_exit(json_error.error != QJsonParseError::NoError || !json_document.isObject());
+	check_true_exit(json_error.error != QJsonParseError::NoError || !json_document.isObject(), "Json format is not correct.");
 
 	const QJsonObject json_object{ json_document.object() };
 
@@ -75,6 +75,9 @@ int main(int argc, char* argv[])
 	TestCase::is_record_ = json_object.value("Record").toBool();
 	TestCase::file_name_ = file_case_name;
 	TestCase::json_document_ = json_document;
+	QJsonObject json_object_image_identification{ json_object.value("ImageIdentification").toObject() };
+	TestCase::is_image_identification_ = json_object_image_identification.value("Enable").toBool();
+	TestCase::folder_path_image_identification_ = json_object_image_identification.value("ImageFolder").toString();
 
 	TestCase::Log(TestCase::GetUrl().toString(), TestCase::LogType::kUrl);
 
@@ -126,15 +129,23 @@ int main(int argc, char* argv[])
 
 	RequestInterceptor* request_interceptor{ new RequestInterceptor(&web_view) };
 
-	QThread* sub{ new QThread };
-	CaptureInRealTime* work{ new CaptureInRealTime };
-	work->moveToThread(sub);
-	sub->start();
+	// 新线程 每秒截图判断一次
+	if (TestCase::is_image_identification_)
+	{
+		QThread* sub{ new QThread };
+		CaptureInRealTime* work{ new CaptureInRealTime };
+		work->moveToThread(sub);
+		sub->start();
 
-	QTimer timer;
-	timer.setInterval(1000);
-	QObject::connect(&timer, &QTimer::timeout, work, &CaptureInRealTime::CaptureScreenShot);
-	timer.start();
+		QObject::connect(work, &CaptureInRealTime::throw_error, &app, []() -> void
+			{
+				QMessageBox* msg_box{ new QMessageBox };
+				msg_box->setAttribute(Qt::WA_DeleteOnClose);
+				msg_box->setWindowTitle("WAIT");
+				msg_box->setText("Throw Error");
+				msg_box->exec();
+			});
+	}
 
 	QObject::connect(&web_view, &QWebEngineView::loadFinished, [&web_view, &is_completed, &request_interceptor]() -> void
 		{
@@ -192,18 +203,28 @@ int main(int argc, char* argv[])
 	return QApplication::exec();
 }
 
-void check_true_exit(bool flag)
+void check_true_exit(const bool& flag, const QString& s = "")
 {
 	if (flag)
 	{
+		if (!s.isEmpty())
+		{
+			qDebug().noquote() << s;
+		}
+		system("pause");
 		exit(0);
 	}
 }
 
-void check_false_exit(bool flag)
+void check_false_exit(const bool& flag, const QString& s = "")
 {
 	if (!flag)
 	{
+		if (!s.isEmpty())
+		{
+			qDebug().noquote() << s;
+		}
+		system("pause");
 		exit(0);
 	}
 }

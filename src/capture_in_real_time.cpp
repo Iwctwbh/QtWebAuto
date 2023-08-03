@@ -1,6 +1,7 @@
 ﻿#include "capture_in_real_time.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QThread>
 
 #include "test_case.h"
@@ -9,25 +10,31 @@
 
 CaptureInRealTime::CaptureInRealTime(QObject* parent) : QObject(parent)
 {
-
+	timer_ = new QTimer(this);
+	timer_->setInterval(time_interval_);
+	QObject::connect(timer_, &QTimer::timeout, this, &CaptureInRealTime::CaptureScreenShot);
+	timer_->start();
 }
 
 void CaptureInRealTime::CaptureScreenShot()
 {
-	qDebug() << "Start Capture";
-
 	if (TestCase::web_view_default_widget_)
 	{
-		qDebug() << "has web view";
 		const QPixmap picture{ TestCase::web_view_default_widget_->grab(QRect(0, 0, TestCase::web_view_default_widget_->width(), TestCase::web_view_default_widget_->height())) };
 		const cv::Mat capture{ CommonTools::QImageToMat(picture.toImage())};
 
-		const cv::Mat find_image = cv::imread("resources/Error.png", cv::IMREAD_GRAYSCALE);
-		//cv::imshow("Find Image", find_image);
-		ImageIdentification::FindPositions(capture, find_image);
-
-		//cv::imshow("Capture", capture);
+		const QDir dir{ TestCase::folder_path_image_identification_ };
+		const QStringList list_files{ dir.entryList(QStringList{ "*.png" }, QDir::Files) };
+		std::ranges::for_each(list_files, [&capture, this](const QString& s)
+			{
+				qDebug() << (TestCase::folder_path_image_identification_ + "/" + s).toStdString();
+				const cv::Mat find_image = cv::imread((TestCase::folder_path_image_identification_ + "/" + s).toStdString(), cv::IMREAD_GRAYSCALE);
+				if (ImageIdentification::FindPositions(capture, find_image))
+				{
+					timer_->stop();
+					emit throw_error();
+					return;
+				}
+			});
 	}
-
-	qDebug() << "End Capture";
 }

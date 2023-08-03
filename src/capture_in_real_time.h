@@ -10,7 +10,12 @@ class CaptureInRealTime final : public QObject
 public:
 	explicit CaptureInRealTime(QObject* parent = nullptr);
 
-	static void CaptureScreenShot(void);
+	void CaptureScreenShot(void);
+
+	inline static int time_interval_{ 1000 }; // ms
+
+private:
+	QTimer* timer_{};
 
 signals:
 	void throw_error(void);
