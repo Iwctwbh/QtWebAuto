@@ -22,6 +22,7 @@ void check_false_exit(const bool&, const QString&);
 
 int main(int argc, char* argv[])
 {
+	//qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "9223");
 	QApplication app(argc, argv);
 	//QApplication::setQuitOnLastWindowClosed(false);
 

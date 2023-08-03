@@ -27,7 +27,6 @@ void CaptureInRealTime::CaptureScreenShot()
 		const QStringList list_files{ dir.entryList(QStringList{ "*.png" }, QDir::Files) };
 		std::ranges::for_each(list_files, [&capture, this](const QString& s)
 			{
-				qDebug() << (TestCase::folder_path_image_identification_ + "/" + s).toStdString();
 				const cv::Mat find_image = cv::imread((TestCase::folder_path_image_identification_ + "/" + s).toStdString(), cv::IMREAD_GRAYSCALE);
 				if (ImageIdentification::FindPositions(capture, find_image))
 				{

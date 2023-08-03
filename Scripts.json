@@ -1,16 +1,67 @@
-﻿{
-  "Url": "",
-  "LogLevel": "Debug",
-  "ShowWebViewTime": "start",
-  "RunningInterval": 100,
-  "Record": false,
+{
   "ImageIdentification": {
-    "Enable": true,
-    "TimeInterval": 1000,
+    "Enable": false,
     "ImageFolder": "resources",
     "MinSimilarity": 0.5
   },
+  "LogLevel": "Debug",
+  "Record": false,
+  "RunningInterval": 500,
+  "ShowWebViewTime": "start",
   "Steps": {
+    "https://iwctwbh.github.io/ReactBlogWeb/": {
+      "Non-Automatic": [
+        "@{WAIT, 1500}@",
+        "@{COORDINATE, 663, 38}@",
+        "@{KEY, 16777219}@",
+        "@{SEND_TEXT, \"1\"}@",
+        "@{COORDINATE, 1286, 48}@",
+        "@{COORDINATE, 676, 57}@",
+        "@{KEY, 16777219}@",
+        "@{SEND_TEXT, \"2\"}@",
+        "@{COORDINATE, 1274, 54}@",
+        "@{COORDINATE, 681, 44}@",
+        "@{KEY, 16777219}@",
+        "@{SEND_TEXT, \"0\"}@",
+        "@{COORDINATE, 1269, 47}@",
+        "@{COORDINATE, 833, 37}@",
+        "@{KEY, 16777219}@",
+        "@{COORDINATE, 1300, 53}@",
+        "@{COORDINATE, 825, 429}@",
+        "@{KEY, 16777219}@",
+        "@{SEND_TEXT, \"2\"}@",
+        "@{COORDINATE, 1282, 420}@",
+        "@{COORDINATE, 833, 303}@",
+        "@{KEY, 16777219}@",
+        "@{SEND_TEXT, \"10\"}@",
+        "@{COORDINATE, 1282, 314}@",
+        "@{COORDINATE, 1419, 109}@",
+        "@{COORDINATE, 1419, 109}@",
+        "@{SCROLL, 1419, 541, 1427, 572, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 541, 1427, 572, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 541, 1427, 572, 0, 0, 0, -120}@",
+        "@{SCROLL, 1423, 495, 1431, 526, 0, 0, 0, -120}@",
+        "@{SCROLL, 1424, 494, 1432, 525, 0, 0, 0, -120}@",
+        "@{SCROLL, 1424, 448, 1432, 479, 0, 0, 0, -120}@",
+        "@{SCROLL, 1424, 447, 1432, 478, 0, 0, 0, -120}@",
+        "@{SCROLL, 1424, 444, 1432, 475, 0, 0, 0, -120}@",
+        "@{SCROLL, 1423, 423, 1431, 454, 0, 0, 0, -120}@",
+        "@{SCROLL, 1423, 423, 1431, 454, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{SCROLL, 1419, 381, 1427, 412, 0, 0, 0, -120}@",
+        "@{COORDINATE, 1418, 542}@",
+        "@{COORDINATE, 1418, 542}@"
+      ]
+    }
   },
-  "StopStep": { "": 2 }
+  "StopStep": {
+    "": 1
+  },
+  "Url": "https://iwctwbh.github.io/ReactBlogWeb/"
 }

@@ -136,10 +136,6 @@ QWidget* TestCase::GetWebViewWidget()
 
 void TestCase::Log(const QString& arg_log, const LogType& arg_log_type)
 {
-	if (arg_log_type == LogType::kEvent && is_record_ == false)
-	{
-		return;
-	}
 	if (operator>=(log_level_, arg_log_type))
 	{
 		qDebug().noquote() << arg_log;

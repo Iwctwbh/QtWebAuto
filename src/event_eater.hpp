@@ -185,7 +185,6 @@ inline bool EventEater::eventFilter(QObject* obj, QEvent* event)
 
 		case QEvent::Wheel:
 		{
-			qDebug() << event;
 			if (!TestCase::CheckIsEvent())
 			{
 				const QWheelEvent* wheel_event = dynamic_cast<QWheelEvent*>(event);
