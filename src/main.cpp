@@ -79,6 +79,9 @@ int main(int argc, char* argv[])
 	QJsonObject json_object_image_identification{ json_object.value("ImageIdentification").toObject() };
 	TestCase::is_image_identification_ = json_object_image_identification.value("Enable").toBool();
 	TestCase::folder_path_image_identification_ = json_object_image_identification.value("ImageFolder").toString();
+	TestCase::image_identification_time_interval_ = json_object_image_identification.value("TimeInterval").toInt();
+	TestCase::after_identification_wait_time_ = json_object_image_identification.value("AfterIdentificationWaitTime").toInt();
+	TestCase::identification_count_limit_ = json_object_image_identification.value("IdentificationCountLimit").toInt();
 
 	TestCase::Log(TestCase::GetUrl().toString(), TestCase::LogType::kUrl);
 
@@ -135,6 +138,9 @@ int main(int argc, char* argv[])
 	{
 		QThread* sub{ new QThread };
 		CaptureInRealTime* work{ new CaptureInRealTime };
+		CaptureInRealTime::time_interval_ = TestCase::image_identification_time_interval_;
+		CaptureInRealTime::after_identification_wait_time_ = TestCase::after_identification_wait_time_;
+		CaptureInRealTime::identification_count_limit_ = TestCase::identification_count_limit_;
 		work->moveToThread(sub);
 		sub->start();
 

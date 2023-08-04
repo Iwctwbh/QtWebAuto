@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QThread>
+#include <QTest>
 
 #include "test_case.h"
 #include "common_tools.hpp"
@@ -32,6 +33,12 @@ void CaptureInRealTime::CaptureScreenShot()
 				{
 					timer_->stop();
 					emit throw_error();
+					if (identification_count_limit_ != 1)
+					{
+						--identification_count_limit_;
+						QTest::qWait(after_identification_wait_time_);
+						timer_->start();
+					}
 					return;
 				}
 			});

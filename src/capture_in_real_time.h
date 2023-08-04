@@ -13,6 +13,8 @@ public:
 	void CaptureScreenShot(void);
 
 	inline static int time_interval_{ 1000 }; // ms
+	inline static int after_identification_wait_time_{ 3000 }; // ms
+	inline static int identification_count_limit_{ 3 };
 
 private:
 	QTimer* timer_{};

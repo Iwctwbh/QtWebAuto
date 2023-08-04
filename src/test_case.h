@@ -72,6 +72,9 @@ public:
 	inline static QWidget* web_view_default_widget_{};
 	inline static bool is_image_identification_{};
 	inline static QString folder_path_image_identification_{};
+	inline static int image_identification_time_interval_{};
+	inline static int after_identification_wait_time_{};
+	inline static int identification_count_limit_{};
 
 private:
 	enum LogLevel
